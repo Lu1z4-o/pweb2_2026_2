@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Aluno;
+use App\Models\CategoriaAluno;
 
 class AlunoController extends Controller
 {
@@ -16,7 +17,10 @@ class AlunoController extends Controller
 
     function create()
     {
-        return view('aluno.form');
+        $categorias = CategoriaAluno::orderBy('nome')->get();
+        return view('aluno.form',
+        compact('data'),
+        compact('categorias'));
     }
 
     function store(Request $request)
@@ -29,11 +33,14 @@ class AlunoController extends Controller
     function validationForm(Request $request){
         $request->validate([
             'nome'=>'required',
-            'cpf'=>'required',],
+            'cpf'=>'required',
+            'categoria_id=>required',],
         [
             'nome.required' => "O :attribute é obrigatório",
-            'cpf.required' => "O :attribute é obrigatório"
-        ]); // altera a mensagem de erro original de atributos obrigatórios 
+            'cpf.required' => "O :attribute é obrigatório",
+            'categoria_id.required' => "O :attribute é obrigatório"
+
+        ],); // altera a mensagem de erro original de atributos obrigatórios 
     }
 
       function edit($id)
