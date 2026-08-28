@@ -3,7 +3,7 @@
 @section ('conteudo')
 <div class="row">
     <div class="row">
-        <form action="UsuarioList.php" method="post">
+        <form action="{{route('aluno.search')}}" method="post">
             <div class="row">
                 <h3> Listagem de Usuário</h3>
                 <div class="col-2">
@@ -11,11 +11,11 @@
                     <select name="tipo" class="form-select">
                         <option value="nome">Nome</option>
                         <option value="nome">Telefone</option>
-                        <option value="nome">Email</option>
+                        <option value="nome">cpf</option>
                     </select>
                 </div>
                 <div class="col-5">
-                    <label for="email">Valor</label>
+                    <label for="cpf">Valor</label>
                     <input type="text" name="valor" placeholder="Pesquisar..." class="form-control" value="">
                 </div>
                 <div class="col-5">
@@ -35,7 +35,7 @@
                 <th scope="col">#</th>
                 <th scope="col">Nome</th>
                 <th scope="col">Telefone</th>
-                <th scope="col">Email</th>
+                <th scope="col">CPF</th>
                 <th scope="col">Ação</th>
             </tr>
         </thead>
@@ -47,14 +47,17 @@
                 <td>{{$item->telefone}}</td>
                 <td>{{$item->cpf}}</td>
                 <td>
-                    <a href='./UsuarioForm.php?id=$item->id'
-                        class='btn btn-warning' title='Editar'>Editar</a>
+                    <a href="{{route('aluno.edit', $item->id)}}" class='btn btn-warning'>Editar</a>
                 </td>
 
                 <td>
-                    <a href='./UsuarioList.php?id=$item->id'
-                        class='btn btn-danger' title='Excluir'
-                        onclick='return confirm'(\"Deseja excluir?\")'>Deletar</a></td>
+                    <form action="{{route('aluno.destroy', $item->id)}}" method="post">
+                        @csrf 
+                        @method('DELETE')
+                        <button type="submit" class='btn btn-danger' title='Excluir' 
+                        onclick='return confirm("Deseja excluir?")'>Deletar</button>
+                    </form>
+                    </td>
     </tr>
         @endforeach
         </tbody>
