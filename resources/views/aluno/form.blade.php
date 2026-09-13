@@ -4,18 +4,19 @@
 <div class="row">
     @php
     if(!empty($data->id)){
-        $action = route('aluno.update', $data->id);
+    $action = route('aluno.update', $data->id);
     }
     else{
-        $action = route('aluno.store');
+    $action = route('aluno.store');
     }
     @endphp
     <h4>Formulário de Alunos</h4>
-    <form action="{{ $action }}" method="post">
-        @csrf 
+    <form action="{{ $action }}" method="post" enctype="multipart/form-data">
+        <!--Enctype avisa que será enviado um arquivo-->
+        @csrf
         @if (!empty($data->id))
-            @method('PUT')
-        @endif    
+        @method('PUT')
+        @endif
         <div class="row">
             <input type="hidden" name="id" value="{{ old('id', $data->id ?? '') }}">
             <div class=" col-6">
@@ -35,14 +36,23 @@
             <div class=" col-6">
                 <label for="categoria_id">Categoria</label>
                 <select name="categoria_id" class=form-select>
-                @foreach($cateogrias as $item ) 
+                    @foreach($categorias as $item )
                     <option value="{{$item->id}}"
                         {{old ('categoria_id', $data->categoria_id ?? '')
-                        == item->id ? 'selected' : '' }}>
-                    {{$item->nome}}
+                        == $item->id ? 'selected' : '' }}>
+                        {{$item->nome}}
                     </option>
-                @endforeach
+                    @endforeach
                 </select>
+            </div>
+            <div class=" col-6">
+                <label for="imagem">Imagem</label>
+                @php
+                $nome_imagem = !empty($data->imagem) ? $data->imagem : 'sem-foto.jpg';
+                @endphp
+                <img src="/storage/{{ $nome_imagem}}"
+                    class="rounded-circle" width="200px" height="200px" alt="Imagem">
+                <input type="file" name="imagem" class="form-control" value="{{ old('imagem', $data->imagem ?? '') }}">
             </div>
 
             <div class="mt-2">
