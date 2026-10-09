@@ -12,57 +12,93 @@ class AlunoController extends Controller
     {
         $dados = Aluno::All();
 
-        return view('aluno.list', compact('dados'));
+        return view('aluno.list')->with(['dados' => $dados]);
     }
 
     function create()
     {
         $categorias = CategoriaAluno::orderBy('nome')->get();
-        return view('aluno.form',
-        compact('data'),
-        compact('categorias'));
+
+        return view('aluno.form')->with(compact('categorias'));
+    }
+
+
+    function validateForm(Request $request)
+    {
+        $request->validate([
+            'nome' => 'required',
+            'cpf' => 'required',
+            'categoria_id' => 'required',
+            'imagem' => 'nullable|image|mimes:png,jpg,jpeg',
+        ], [
+            'nome.required' => "O :attribute é obrigatorio",
+            'cpf.required' => "O :attribute é obrigatorio",
+            'imagem.image' => "O :attribute deve ser enviado",
+            'imagem.mimes' => "O :attribute deve ser das extensões:PNG,JPEG,JPG",
+        ]);
     }
 
     function store(Request $request)
     {
-       // dd($request->all()) pega todos os dados que foram inseridos no formulário, mas ainda não salva no banco
-        $this->validationForm($request); 
-        Aluno::create($request->all());
-        return redirect ('aluno')->with("sucess", 'Registro salvo com sucesso!');
-}
-    function validationForm(Request $request){
-        $request->validate([
-            'nome'=>'required',
-            'cpf'=>'required',
-            'categoria_id=>required',],
-        [
-            'nome.required' => "O :attribute é obrigatório",
-            'cpf.required' => "O :attribute é obrigatório",
-            'categoria_id.required' => "O :attribute é obrigatório"
+        //dd($request->all());
+        $this->validateForm($request);
 
-        ],); // altera a mensagem de erro original de atributos obrigatórios 
+        $data = $request->all();
+        $imagem = $request->file('imagem');
+
+        if ($imagem) {
+            $nome_imagem = date('YmdiHs') . "." . $imagem->getClientOriginalExtension();
+            $diretorio = "imagem/aluno/";
+            $imagem->storeAs($diretorio, $nome_imagem, 'public');
+            $data['imagem'] = $diretorio . $nome_imagem;
+        }
+
+        Aluno::create($data);
+
+        return redirect('aluno')->with("success", 'Registro Salvo com sucesso!');
     }
 
-      function edit($id)
+    function edit($id)
     {
-        $data= Aluno::find($id); // Função que habilita a edição
-        return view('aluno.form', compact ('data'));
+        $data = Aluno::find($id);
+        $categorias = CategoriaAluno::orderBy('nome')->get();
+
+        // dd($categorias);
+        return view('aluno.form')->with(compact('data', 'categorias'));
     }
 
-    function update(Request $request, $id) // Função que salva a edição 
+
+    function update(Request $request, $id)
     {
-        $this->validationForm($request); 
-        Aluno::find($id)->update($request->all());
-        return redirect ('aluno')->with("sucess", 'Registro atualizado com sucesso!');
-}
-    function destroy($id){
+        //dd($request->all());
+        $this->validateForm($request);
+
+        $data = $request->all();
+        $imagem = $request->file('imagem');
+
+        if ($imagem) {
+            $nome_imagem = date('YmdiHs') . "." . $imagem->getClientOriginalExtension();
+            $diretorio = "imagem/aluno/";
+
+            $imagem->storeAs($diretorio, $nome_imagem, 'public');
+            $data['imagem'] = $diretorio . $nome_imagem;
+        }
+
+        Aluno::find($id)->update($data);
+
+        return redirect('aluno')->with("success", 'Registro Atualizado com sucesso!');
+    }
+
+    function destroy($id)
+    {
         Aluno::destroy($id);
-        return redirect ('aluno')->with("sucess", 'Registro removido com sucesso!');
+
+        return redirect('aluno')->with("success", 'Registro removido com sucesso!');
     }
 
     public function search(Request $request)
     {
-        if(!empty($request->valor)){
+        if (!empty($request->valor)) {
             $dados = Aluno::where(
                 $request->tipo,
                 'like',
@@ -70,8 +106,8 @@ class AlunoController extends Controller
             )->get();
         } else {
             $dados = Aluno::All();
-            
         }
+
         return view('aluno.list', compact('dados'));
     }
 }
