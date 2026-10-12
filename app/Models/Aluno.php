@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Aluno extends Model
 {
-    use Hasfactory;
+    use HasFactory;
 
     protected $fillable = [
         'nome',
@@ -17,8 +17,8 @@ class Aluno extends Model
         'categoria_id',
     ];
 
-    protected $cast = [
-        'categoria_id' => 'integer'
+    protected $casts = [
+        'categoria_id' => 'integer',
     ];
 
     public function categoria()
